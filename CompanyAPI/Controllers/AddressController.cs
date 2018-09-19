@@ -1,5 +1,5 @@
 ﻿using CompanyAPI.Repository;
-//using AddressAPI.Controllers.Helper;
+using CompanyAPI.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,11 +10,14 @@ using CompanyAPI.Controllers.Helper;
 using CompanyAPI.Model;
 using CompanyAPI.Interfaces;
 
+
 namespace CompanyAPI.Controllers
    {
     [Route("api/Address")]
     public class AddressController : Controller
     {
+        Authentication _Auth = new Authentication();
+
         //AddressRepo repo = new AddressRepo();
         IAddressRepo repo;
         public AddressController(IAddressRepo repo)
@@ -24,30 +27,37 @@ namespace CompanyAPI.Controllers
 
         //GET api/values
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get([FromHeader] string Authorization)
         {
-            try
+            //check or checkAccess
+            if (_Auth.CheckToken(Authorization) == true)
             {
-                var result = repo.Read(0);
-                return Ok(result);
-            }
-            catch (RepoException ex)
-            {
-                switch (ex.RepoExceptionType)
+                try
                 {
-                    case RepoException.ExceptionType.NOCONTENT:
-                    case RepoException.ExceptionType.NOTFOUND:
-                        return StatusCode(StatusCodes.Status204NoContent);
-                    case RepoException.ExceptionType.ERROR:
-                        return StatusCode(StatusCodes.Status409Conflict);
-                    case RepoException.ExceptionType.INVALIDARGUMENT:
-                        return StatusCode(StatusCodes.Status400BadRequest);
-                    case RepoException.ExceptionType.SQLERROR:
-                        return StatusCode(StatusCodes.Status409Conflict);
+                    var result = repo.Read(0);
+                    return Ok(result);
                 }
+                catch (RepoException ex)
+                {
+                    switch (ex.RepoExceptionType)
+                    {
+                        case RepoException.ExceptionType.NOCONTENT:
+                        case RepoException.ExceptionType.NOTFOUND:
+                            return StatusCode(StatusCodes.Status204NoContent);
+                        case RepoException.ExceptionType.ERROR:
+                            return StatusCode(StatusCodes.Status409Conflict);
+                        case RepoException.ExceptionType.INVALIDARGUMENT:
+                            return StatusCode(StatusCodes.Status400BadRequest);
+                        case RepoException.ExceptionType.SQLERROR:
+                            return StatusCode(StatusCodes.Status409Conflict);
+                    }
+                }
+                return StatusCode(StatusCodes.Status400BadRequest);
             }
-
-            return StatusCode(StatusCodes.Status400BadRequest);
+            else
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized);
+            }
         }
         //GET api/value
         [HttpGet("{Id}")]

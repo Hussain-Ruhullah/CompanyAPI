@@ -29,7 +29,8 @@ namespace CompanyAPI.Controllers
         [HttpGet]
         public IActionResult Get([FromHeader] string Authorization)
         {
-            if (_Auth.Check(Authorization)==true)
+            //check or checkAccess
+            if (_Auth.CheckToken(Authorization)==true)
             {
                 try
                 {

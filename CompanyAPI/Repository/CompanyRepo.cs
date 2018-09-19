@@ -15,7 +15,7 @@ namespace CompanyAPI.Repository
     {
         private object ex;
 
-        public List<Company> Read(int id = 0)
+        public List<Company> Read(int id)
         {
             if (id == 0)
             {
@@ -34,25 +34,29 @@ namespace CompanyAPI.Repository
                 {
                     throw new RepoException(RepoException.ExceptionType.INVALIDARGUMENT);
                 }
-
-                try
+                else
                 {
-                    SqlConnection conn = new SqlConnection("Data Source=tappqa;Initial Catalog=Traning-HR-Company;Integrated Security=True");
-
-                    conn.Open();
-                    DynamicParameters param = new DynamicParameters();
-                    param.Add("@Id", id);
-                    var result = conn.Query<Company>("SELECT Name FROM Company Where id = @Id", param).ToList();
-                    if (result == null)
+                    try
                     {
-                        throw new RepoException(RepoException.ExceptionType.NOCONTENT);
+                        SqlConnection conn = new SqlConnection("Data Source=tappqa;Initial Catalog=Traning-HR-Company;Integrated Security=True");
+
+                        conn.Open();
+                        DynamicParameters param = new DynamicParameters();
+                        param.Add("@Id", id);
+                        var result = conn.Query<Company>("SELECT Name,Id, Country,City, ZipCode, Street FROM viCompany Where id = @Id", param).ToList();
+                        if (result == null)
+                        {
+                            throw new RepoException(RepoException.ExceptionType.NOCONTENT);
+                        }
+                        return result;
                     }
-                    return result;
+                    catch (SqlException ex)
+                    {
+                        throw new RepoException(ex.ToString(), RepoException.ExceptionType.SQLERROR);
+                    }
                 }
-                catch (SqlException ex)
-                {
-                    throw new RepoException(ex.ToString(), RepoException.ExceptionType.SQLERROR);
-                }
+
+
             }
         }
 
