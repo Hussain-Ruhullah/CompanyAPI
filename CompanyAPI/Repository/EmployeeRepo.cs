@@ -1,26 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Dapper;
-using System.Data.SqlClient;
-using CompanyAPI.Model;
 using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
 using CompanyAPI.Controllers.Helper;
+using CompanyAPI.Model;
+using Dapper;
 using CompanyAPI.Interfaces;
+
+
+
 
 namespace CompanyAPI.Repository
 {
-    class AddressRepo : IAddressRepo
+    public class EmployeeRepo : IEmployeeRepo
     {
         private object ex;
 
-        public List<Address> Read(int id = 0)
+        public List<Employee> Read(int id = 0)
         {
             if (id == 0)
             {
                 SqlConnection conn = new SqlConnection("Data Source=tappqa;Initial Catalog=Traning-HR-Company;Integrated Security=True");
                 conn.Open();
-                var result = conn.Query<Address>("SELECT * FROM viAddress").ToList();
+                var result = conn.Query<Employee>("SELECT * FROM viEmployee").ToList();
                 if (result.Any() == false)
                 {
                     throw new RepoException(RepoException.ExceptionType.NOCONTENT);
@@ -41,7 +44,7 @@ namespace CompanyAPI.Repository
                     conn.Open();
                     DynamicParameters param = new DynamicParameters();
                     param.Add("@Id", id);
-                    var result = conn.Query<Address>("SELECT Id,Country,City,ZipCode,Street FROM Address Where id = @Id", param).ToList();
+                    var result = conn.Query<Employee>("SELECT Id,Country,City,ZipCode,Street FROM Employee Where id = @Id", param).ToList();
                     if (result == null)
                     {
                         throw new RepoException(RepoException.ExceptionType.NOCONTENT);
@@ -55,12 +58,12 @@ namespace CompanyAPI.Repository
             }
         }
 
-        //internal object AddressList()
+        //internal object EmployeeList()
         //{
         //    throw new RepoException(ex.ToString(), RepoException.ExceptionType.SQLERROR);
         //}
 
-        public Address Delete(int id)
+        public Employee Delete(int id)
         {
             if (id < 0)
             {
@@ -74,8 +77,8 @@ namespace CompanyAPI.Repository
                 conn.Open();
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@Id", id);
-                var result = conn.QueryFirstOrDefault<Address>(
-                    "UPDATE Address SET DeletedTime = GetDate() WHERE Id = @Id SELECT Id FROM Address WHERE Id = @Id", param);
+                var result = conn.QueryFirstOrDefault<Employee>(
+                    "UPDATE Employee SET DeletedTime = GetDate() WHERE Id = @Id SELECT Id FROM viEmployee WHERE Id = @Id", param);
 
                 return result;
             }
@@ -85,23 +88,23 @@ namespace CompanyAPI.Repository
             }
         }
 
-        internal object Delete(object deleteAddress)
+        internal object Delete(object deleteEmployee)
         {
             throw new NotImplementedException();
         }
 
-        public Address Create(Address model)
+        public Employee Create(Employee model)
         {
             return AddOrUpdate(model);
         }
 
-        public Address Update(Address model)
+        public Employee Update(Employee model)
         {
             return AddOrUpdate(model, model.Id);
 
         }
 
-        private Address AddOrUpdate(Address pAddress, int? @Id = null)
+        private Employee AddOrUpdate(Employee pEmployee, int? @Id = null)
         {
             try
             {
@@ -109,13 +112,12 @@ namespace CompanyAPI.Repository
 
                 DynamicParameters dParm = new DynamicParameters();
                 dParm.Add("@Id", @Id);
-                dParm.Add("@Country", pAddress.Country);
-                dParm.Add("@City", pAddress.City);
-                dParm.Add("@ZipCode", pAddress.ZipCode);
-                dParm.Add("@Street", pAddress.Street);
-                dParm.Add("@HouseNumber", pAddress.Street);
+                dParm.Add("@Country", pEmployee.FirstName);
+                dParm.Add("@City", pEmployee.LastName);
+                dParm.Add("@ZipCode", pEmployee.Gender);
+                dParm.Add("@Street", pEmployee.AddressId);
 
-                return conn.QueryFirstOrDefault<Address>("spInsertOrUpdateAddress", dParm, null, null, CommandType.StoredProcedure);
+                return conn.QueryFirstOrDefault<Employee>("spInsertOrUpdateEmployee", dParm, null, null, CommandType.StoredProcedure);
             }
             catch (SqlException ex)
             {

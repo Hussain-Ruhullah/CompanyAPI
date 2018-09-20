@@ -12,21 +12,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CompanyAPI.Controllers
-   {
-    [Route("api/Address")]
-    public class AddressController : Controller
+{
+    [Route("api/Employee")]
+    public class EmployeeController : Controller
     {
         Authentication _Auth = new Authentication();
 
-        //AddressRepo repo = new AddressRepo();
-        IAddressRepo repo;
-        public AddressController(IAddressRepo repo)
+        //EmployeeRepo repo = new EmployeeRepo();
+        IEmployeeRepo repo;
+        public EmployeeController(IEmployeeRepo repo)
         {
             this.repo = repo;
         }
 
         //GET api/values
-        [Authorize(Roles ="1")]
+        [Authorize(Roles = "1")]
         [HttpGet]
         public IActionResult Get([FromHeader] string Authorization)
         {
@@ -62,7 +62,7 @@ namespace CompanyAPI.Controllers
         }
         //GET api/value
         [HttpGet("{Id}")]
-        public IActionResult GetAddressById(int id)
+        public IActionResult GetEmployeeById(int id)
         {
             try
             {
@@ -90,32 +90,31 @@ namespace CompanyAPI.Controllers
         //POST api/values
         [HttpPost]
 
-        public IActionResult Create([FromBody] Model.Address newAddress)
+        public IActionResult Create([FromBody] Model.Employee newEmployee)
         {
-            return StatusCode(StatusCodes.Status200OK, repo.Create(newAddress));
+            return StatusCode(StatusCodes.Status200OK, repo.Create(newEmployee));
         }
 
         //PUT api/values
 
         [HttpPut]
-        public IActionResult Put(int id, [FromBody] Model.Address updateAddress)
+        public IActionResult Put(int id, [FromBody] Model.Employee updateEmployee)
         {
-            updateAddress.Id = id;
-            var retval = repo.Update(updateAddress);
+            updateEmployee.Id = id;
+            var retval = repo.Update(updateEmployee);
 
             return StatusCode(StatusCodes.Status200OK, retval);
         }
 
         //Delete api/values
         [HttpDelete]
-        public IActionResult Delete([FromBody] Address DeleteAddress)
+        public IActionResult Delete([FromBody] Employee DeleteEmployee)
         {
 
-            var retval = repo.Delete(DeleteAddress.Id);
+            var retval = repo.Delete(DeleteEmployee.Id);
 
             return StatusCode(StatusCodes.Status200OK, retval);
         }
 
     }
 }
-

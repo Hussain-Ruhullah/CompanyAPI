@@ -9,24 +9,23 @@ using CompanyAPI.Repository;
 using CompanyAPI.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+
+
 
 namespace CompanyAPI.Controllers
-   {
-    [Route("api/Address")]
-    public class AddressController : Controller
+{
+    public class DepartmentController : Controller
     {
         Authentication _Auth = new Authentication();
 
-        //AddressRepo repo = new AddressRepo();
-        IAddressRepo repo;
-        public AddressController(IAddressRepo repo)
+        //DepartmentRepo repo = new DepartmentRepo();
+        IDepartmentRepo repo;
+        public DepartmentController(IDepartmentRepo repo)
         {
             this.repo = repo;
         }
 
         //GET api/values
-        [Authorize(Roles ="1")]
         [HttpGet]
         public IActionResult Get([FromHeader] string Authorization)
         {
@@ -62,7 +61,7 @@ namespace CompanyAPI.Controllers
         }
         //GET api/value
         [HttpGet("{Id}")]
-        public IActionResult GetAddressById(int id)
+        public IActionResult GetDepartmentById(int id)
         {
             try
             {
@@ -90,28 +89,28 @@ namespace CompanyAPI.Controllers
         //POST api/values
         [HttpPost]
 
-        public IActionResult Create([FromBody] Model.Address newAddress)
+        public IActionResult Create([FromBody] Model.Department newDepartment)
         {
-            return StatusCode(StatusCodes.Status200OK, repo.Create(newAddress));
+            return StatusCode(StatusCodes.Status200OK, repo.Create(newDepartment));
         }
 
         //PUT api/values
 
         [HttpPut]
-        public IActionResult Put(int id, [FromBody] Model.Address updateAddress)
+        public IActionResult Put(int id, [FromBody] Model.Department updateDepartment)
         {
-            updateAddress.Id = id;
-            var retval = repo.Update(updateAddress);
+            updateDepartment.Id = id;
+            var retval = repo.Update(updateDepartment);
 
             return StatusCode(StatusCodes.Status200OK, retval);
         }
 
         //Delete api/values
         [HttpDelete]
-        public IActionResult Delete([FromBody] Address DeleteAddress)
+        public IActionResult Delete([FromBody] Department DeleteDepartment)
         {
 
-            var retval = repo.Delete(DeleteAddress.Id);
+            var retval = repo.Delete(DeleteDepartment.Id);
 
             return StatusCode(StatusCodes.Status200OK, retval);
         }

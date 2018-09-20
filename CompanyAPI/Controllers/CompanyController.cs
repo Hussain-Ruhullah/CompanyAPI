@@ -3,62 +3,59 @@ using CompanyAPI.Controllers.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using CompanyAPI.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CompanyAPI.Interfaces;
 using CompanyAPI.Helper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+using TobitLogger.Core;
+using TobitLogger.Core.Models;
+using TobitWebApiExtensions.Extensions;
 
 
 namespace CompanyAPI.Controllers
 {
     [Route("api/Company")]
-    public class CompanyController : Controller
+    [ApiController]
+    public class CompanyController : ControllerBase
     {
-        Authentication _Auth = new Authentication();
 
-        //CompanyRepo repo = new CompanyRepo();
+        Authentication _Auth = new Authentication();
+        private readonly ILogger<CompanyController> _logger;
         ICompanyRepo repo;
-        public CompanyController(ICompanyRepo repo)
+        public CompanyController(ICompanyRepo repo, ILoggerFactory loggerFactory)
         {
             this.repo = repo;
+            _logger = loggerFactory.CreateLogger<CompanyController>();
         }
 
         //GET api/values
+        [Authorize(Roles = "1")]
         [HttpGet]
         public IActionResult Get([FromHeader] string Authorization)
         {
-            //check or checkAccess
-            if (_Auth.CheckToken(Authorization)==true)
+            try
             {
-                try
-                {
-                    var result = repo.Read(0);
-                    return Ok(result);
-                }
-                catch (RepoException ex)
-                {
-                    switch (ex.RepoExceptionType)
-                    {
-                        case RepoException.ExceptionType.NOCONTENT:
-                        case RepoException.ExceptionType.NOTFOUND:
-                            return StatusCode(StatusCodes.Status204NoContent);
-                        case RepoException.ExceptionType.ERROR:
-                            return StatusCode(StatusCodes.Status409Conflict);
-                        case RepoException.ExceptionType.INVALIDARGUMENT:
-                            return StatusCode(StatusCodes.Status400BadRequest);
-                        case RepoException.ExceptionType.SQLERROR:
-                            return StatusCode(StatusCodes.Status409Conflict);
-                    }
-                }
-                return StatusCode(StatusCodes.Status400BadRequest);
+                var result = repo.Read(0);
+                return Ok(result);
             }
-            else
+            catch (RepoException ex)
             {
-                return StatusCode(StatusCodes.Status401Unauthorized);
+                switch (ex.RepoExceptionType)
+                {
+                    case RepoException.ExceptionType.NOCONTENT:
+                    case RepoException.ExceptionType.NOTFOUND:
+                        return StatusCode(StatusCodes.Status204NoContent);
+                    case RepoException.ExceptionType.ERROR:
+                        return StatusCode(StatusCodes.Status409Conflict);
+                    case RepoException.ExceptionType.INVALIDARGUMENT:
+                        return StatusCode(StatusCodes.Status400BadRequest);
+                    case RepoException.ExceptionType.SQLERROR:
+                        return StatusCode(StatusCodes.Status409Conflict);
+                }
             }
+            return StatusCode(StatusCodes.Status400BadRequest);
         }
+
         //GET api/value
         [HttpGet("{Id}")]
         public IActionResult GetCompanyById(int id)
@@ -89,7 +86,7 @@ namespace CompanyAPI.Controllers
         //POST api/values
         [HttpPost]
 
-        public IActionResult Create([FromBody] CompanyAPI.Model.Company newCompany)
+        public IActionResult Create([FromBody] Company newCompany)
         {
              return StatusCode(StatusCodes.Status200OK, repo.Create(newCompany));
         }
@@ -97,7 +94,7 @@ namespace CompanyAPI.Controllers
         //PUT api/values
 
         [HttpPut]
-        public IActionResult Put(int id, [FromBody] CompanyAPI.Model.Company updateCompany)
+        public IActionResult Put(int id, [FromBody] Company updateCompany)
         {
             updateCompany.Id = id;
             var retval = repo.Update(updateCompany);

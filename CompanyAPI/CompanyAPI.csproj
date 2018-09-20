@@ -2,9 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>dcbb9c32-0b15-44ab-885e-69d07fb0f17d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\appsettings.Development.json\Controllers\" />
+    <Folder Include="Areas\appsettings.Development.json\Data\" />
+    <Folder Include="Areas\appsettings.Development.json\Models\" />
+    <Folder Include="Areas\appsettings.Development.json\Views\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -12,6 +17,12 @@
     <PackageReference Include="Dapper" Version="1.50.5" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <PackageReference Include="TobitLogger.Core" Version="4.1.0" />
+    <PackageReference Include="TobitLogger.Logstash" Version="4.1.0" />
+    <PackageReference Include="TobitLogger.Middleware" Version="4.1.0" />
+    <PackageReference Include="TobitLogger.Remote" Version="4.1.0" />
+    <PackageReference Include="TobitWebApiExtensionsCore" Version="2.0.18" />
   </ItemGroup>
 
 </Project>
